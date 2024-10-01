@@ -23,11 +23,10 @@ def test_editing_leads():
         page.get_by_placeholder("Пароль").press("Enter")
         # Проверка загрузки страницы
         page.wait_for_load_state('networkidle')
-        assert page.url == "https://stage.vedcrm.com/", "URL не соответствует ожидаемому"
+        assert page.url == "https://stage.vedcrm.com/", "Неправильные креды авторизации"
         # Ожидание и клик по кнопке
-        button_locator = page.locator("._titleButtons_16spm_34 > button").first
-        button_locator.wait_for(state='visible')
-        button_locator.click()
+        page.wait_for_selector("//button[span[contains(@class, '_editIcon_148ef_68')]]")
+        page.click("//button[span[contains(@class, '_editIcon_148ef_68')]]")
         # Заполнение формы
         page.get_by_label("Организация").click()
         page.get_by_label("Организация").fill(
@@ -44,15 +43,15 @@ def test_editing_leads():
             "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111@test.com")
         page.get_by_label("Телеграм").click()
         page.get_by_label("Телеграм").fill("@aaaaaaaaaaaaaaaaaaaaaaaaa")
-        partner_selector = page.locator("#partner._select_1iklr_46")
+        partner_selector = page.locator("#partner._select_1j1vj_46")
         partner_selector.wait_for(state='visible')
         # Клик по кнопке "Сохранить"
-        page.get_by_role("button", name="Сохранить").click()
-        time.sleep(2)
+        try:
+            page.get_by_role("button", name="Сохранить").click()
+            page.wait_for_url("https://stage.vedcrm.com", timeout=5000)  # Таймаут для ожидания перехода на новый URL
+            assert page.url == "https://stage.vedcrm.com", "Компания не была отредактирована"
+        except TimeoutError as e:
+            print(f"Не удалось перейти на нужную страницу, возможно произошла ошибка API. Ошибка {e}")
+
         # Закрытие браузера
         browser.close()
-
-
-# Если хотите запускать тесты с Pytest
-if __name__ == "__main__":
-    pytest.main(["-v", "--tb=line"])

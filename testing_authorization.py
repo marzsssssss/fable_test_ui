@@ -29,7 +29,7 @@ def login(page, username, password):
 
 
 def main():
-    # Основная логика программы: авторизация и редактирование лида
+    # Основная логика программы - авторизация
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)  # False - Запуск браузера
         context = browser.new_context(viewport={"width": 1920, "height": 1080})
